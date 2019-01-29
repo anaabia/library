@@ -1,11 +1,12 @@
 import React from 'react';
+import {concatString} from './util.js';
 
 const Book = (props) => {
     return (
         <div className="book">
             <div className="book-top">
             <div className="book-cover" 
-            style={{ width: 128, height: 193, backgroundImage: props.photo}}>
+            style={{ width: 128, height: 193, backgroundImage: `url("${props.photo}")`}}>
             </div>
             <div className="book-shelf-changer">
                 <select>
@@ -18,7 +19,7 @@ const Book = (props) => {
             </div>
             </div>
             <div className="book-title">{props.title}</div>
-            <div className="book-authors">{props.author}</div>
+            <div className="book-authors">{props.authors.reduce((author1, authors2) => concatString(author1,authors2, ', '))}</div>
         </div>
     );
 };
