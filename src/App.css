@@ -122,6 +122,19 @@ button:active {
   padding: 80px 10px 20px;
 }
 
+.error-search {
+  text-align: center;
+  font-size: 26px;
+}
+
+.icon-error{
+  display: block;
+  width: 100px;
+  height: 100px;
+  background-image: url('./icons/error.svg');
+  font-size: 0;
+}
+
 /* books grid */
 
 .books-grid {

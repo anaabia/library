@@ -4,6 +4,7 @@ import { FormattedMessage } from 'react-intl';
 import { Link } from 'react-router-dom'
 import Shelf from './Shelf';
 import { MessageInput } from '../util/messageUtil';
+import ReactLoading from 'react-loading';
 
 class SearchBook extends React.Component {
   state = {
@@ -18,10 +19,13 @@ class SearchBook extends React.Component {
     })
   };
 
-  isValidBooks = () => this.props.booksSearch && this.props.booksSearch.length > 0;
+  isValidBooks = () => this.props.booksSearch && this.props.booksSearch.length > 0 && this.state.search !== '';
 
   noResult = () => this.props.booksSearch && this.props.booksSearch.error && this.state.search.length > 0;
 
+  isLoading = () => !this.noResult() && this.state.search !== '' && this.props.isSearch;
+  
+  isErro = () => this.props.isErro && this.state.search !== '' && !this.isLoading();
   render() {
     return (
       <div className="search-books">
@@ -42,6 +46,15 @@ class SearchBook extends React.Component {
             }
             {this.noResult() &&
               <FormattedMessage id="noResults" />
+            }
+            {this.isLoading() &&
+              <ReactLoading type={'spinningBubbles'} color={'#008000'} height={100} width={100} />
+            }
+            {this.isErro() &&
+              <div className="error-search">
+                <span className="icon-error"></span>
+                <FormattedMessage id="erroSearch" />
+              </div>
             }
           </ol>
         </div>

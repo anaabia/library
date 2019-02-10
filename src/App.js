@@ -4,15 +4,15 @@ import * as BooksAPI from './BooksAPI.js';
 import { Route } from 'react-router-dom'
 import ListShelf from './book/ListShelf';
 import SearchBook from './book/SearchBook';
-import {IntlProvider} from "react-intl";
+import { IntlProvider } from "react-intl";
 import { addLocaleData } from "react-intl";
 import locale_pt from 'react-intl/locale-data/pt';
 import messages_en from "./intl/en.json";
 import messages_pt from "./intl/pt.json";
 
 const messages = {
-    'en': messages_en,
-    'pt': messages_pt
+  'en': messages_en,
+  'pt': messages_pt
 };
 const language = navigator.language.split(/[-_]/)[0];
 
@@ -21,7 +21,9 @@ addLocaleData([...locale_pt]);
 class BooksApp extends React.Component {
   state = {
     books: [],
-    booksSearch: []
+    booksSearch: [],
+    isSearch: false,
+    isErro: false
   }
 
   componentDidMount() {
@@ -32,23 +34,34 @@ class BooksApp extends React.Component {
   }
 
   searchBook = (search) => {
+    this.updateStateBoolean(false, true)
     BooksAPI.search(search)
-    .then(books => this.setState({
-      booksSearch: books && books.length > 0 ? books.map(this.mergerSelf) : books
-    }));
+      .then(books => this.setState({
+        booksSearch: books && books.length > 0 ? books.map(this.mergerSelf) : books,
+        isSearch: false
+      })).catch((error) =>
+        this.updateStateBoolean(true, false)
+      );
+  }
+
+  updateStateBoolean(isErro, isSearch) {
+    this.setState({
+      isErro,
+      isSearch
+    });
   }
 
   filterById = (list, id, shelf) => {
     const book = list.find(book => book.id === id);
-    if(book){
+    if (book) {
       book.shelf = shelf
     }
     return book;
   }
 
-  changeShelf = ( shelf, id ) => {
-   let newShelf = this.filterById(this.state.books, id, shelf);
-    if(!newShelf){
+  changeShelf = (shelf, id) => {
+    let newShelf = this.filterById(this.state.books, id, shelf);
+    if (!newShelf) {
       newShelf = this.filterById(this.state.booksSearch, id, shelf);
     }
     BooksAPI.update(newShelf, shelf);
@@ -60,7 +73,7 @@ class BooksApp extends React.Component {
 
   mergerSelf = (search) => {
     const book = this.state.books.find(book => book.id === search.id);
-    return book ? book: search;
+    return book ? book : search;
   };
 
   render() {
@@ -68,15 +81,17 @@ class BooksApp extends React.Component {
       <IntlProvider locale={language} messages={messages[language]}>
         <div className="app">
           <Route path='/search' render={() => (
-            <SearchBook 
-            changeShelf={this.changeShelf} 
-            searchBooks={this.searchBook} 
-            booksSearch={this.state.booksSearch} />
+            <SearchBook
+              changeShelf={this.changeShelf}
+              searchBooks={this.searchBook}
+              booksSearch={this.state.booksSearch}
+              isSearch={this.state.isSearch}
+              isErro={this.state.isErro} />
           )} />
           <Route exact path='/' render={() => (
-            <ListShelf 
-            changeShelf={this.changeShelf} 
-            books={this.state.books.filter(b => b.shelf !== 'none')} />
+            <ListShelf
+              changeShelf={this.changeShelf}
+              books={this.state.books.filter(b => b.shelf !== 'none')} />
           )} />
         </div>
       </IntlProvider>
